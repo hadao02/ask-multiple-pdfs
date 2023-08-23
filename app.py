@@ -51,9 +51,26 @@ def get_conversation_chain(vectorstore):
     return conversation_chain
 
 
+# def handle_userinput(user_question):
+#     response = st.session_state.conversation({'question': user_question})
+#     st.session_state.chat_history = response['chat_history']
+
+#     for i, message in enumerate(st.session_state.chat_history):
+#         if i % 2 == 0:
+#             st.write(user_template.replace(
+#                 "{{MSG}}", message.content), unsafe_allow_html=True)
+#         else:
+#             st.write(bot_template.replace(
+#                 "{{MSG}}", message.content), unsafe_allow_html=True)
+
 def handle_userinput(user_question):
     response = st.session_state.conversation({'question': user_question})
     st.session_state.chat_history = response['chat_history']
+
+    # If the response is not satisfactory, interact directly with the llm
+    if not response['answers']:
+        direct_response = st.session_state.conversation.llm({'question': user_question})
+        st.session_state.chat_history.append(direct_response)
 
     for i, message in enumerate(st.session_state.chat_history):
         if i % 2 == 0:
